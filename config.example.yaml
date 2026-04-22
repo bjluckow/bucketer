@@ -1,6 +1,6 @@
 source:
   type: local
-  path: ./sample-files
+  path: ./example
   recursive: true
   include:
     - '*.jpg'
@@ -20,12 +20,12 @@ source:
     - 'thumbs/'
 
 buckets:
-  - label: Keep
-    path: ./sorted/keep
+  - label: Cats
+    path: ./example/sorted/cats
     shortcut: '1'
-  - label: Trash
-    path: ./sorted/trash
+  - label: Dogs
+    path: ./example/sorted/dogs
     shortcut: '2'
-  - label: Review Later
-    path: ./sorted/review
+  - label: Some Other Third Thing
+    path: ./example/sorted/review
     shortcut: '3'
