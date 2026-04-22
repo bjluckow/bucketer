@@ -3,6 +3,17 @@ export interface FileItem {
   name: string;
   mime: string;
   size: number;
+  metadata: FileMetadata;
+}
+
+export interface FileMetadata {
+  /** Last modified timestamp */
+  modified: number;
+  /** Image/video dimensions */
+  width?: number;
+  height?: number;
+  /** Audio/video duration in seconds */
+  duration?: number;
 }
 
 export interface Bucket {
@@ -35,6 +46,7 @@ export interface MoveAction {
 export interface MoveRequest {
   filePath: string;
   bucketPath: string;
+  newName?: string;
 }
 
 export interface MoveResponse {
