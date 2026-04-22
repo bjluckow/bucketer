@@ -6,6 +6,7 @@ import { lookup } from 'mime-types';
 import type { AppConfig } from '@bucketer/shared';
 import * as local from '../services/local.js';
 import * as s3 from '../services/s3.js';
+import { getConfigDir } from '../config.js';
 
 export function filesRouter(config: AppConfig): Router {
   const router = Router();
@@ -26,7 +27,7 @@ export function filesRouter(config: AppConfig): Router {
               source.exclude,
             )
           : await local.listFiles(
-              resolve(source.path),
+              resolve(getConfigDir(), source.path),
               source.recursive,
               source.include,
               source.exclude,
@@ -69,7 +70,7 @@ export function filesRouter(config: AppConfig): Router {
         };
         await pump();
       } else {
-        const fullPath = join(resolve(source.path), filePath);
+        const fullPath = join(resolve(getConfigDir(), source.path), filePath);
         const stats = await stat(fullPath);
         const mime = lookup(fullPath) || 'application/octet-stream';
 

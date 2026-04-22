@@ -1,4 +1,10 @@
-import { readdir, stat, rename, mkdir } from 'fs/promises';
+import {
+  readdir,
+  stat,
+  rename,
+  mkdir,
+  copyFile as fsCopyFile,
+} from 'fs/promises';
 import { join, basename, extname, relative } from 'path';
 import { lookup } from 'mime-types';
 import type { FileItem, MoveAction } from '@bucketer/shared';
@@ -68,6 +74,7 @@ export async function listFiles(
             mime,
             size: stats.size,
             metadata: {
+              created: stats.birthtimeMs,
               modified: stats.mtimeMs,
             },
           });
@@ -85,6 +92,7 @@ export async function moveFile(
   filePath: string,
   bucketPath: string,
   newName?: string,
+  copy?: boolean,
 ): Promise<MoveAction> {
   const srcFull = join(sourceRoot, filePath);
   const fileName = newName || basename(filePath);
@@ -93,7 +101,12 @@ export async function moveFile(
   await mkdir(destDir, { recursive: true });
 
   const destFull = join(destDir, fileName);
-  await rename(srcFull, destFull);
+
+  if (copy) {
+    await fsCopyFile(srcFull, destFull);
+  } else {
+    await rename(srcFull, destFull);
+  }
 
   const stats = await stat(destFull);
   const mime = lookup(fileName) || 'application/octet-stream';
@@ -104,16 +117,22 @@ export async function moveFile(
       name: basename(filePath),
       mime,
       size: stats.size,
-      metadata: { modified: stats.mtimeMs },
+      metadata: { created: stats.birthtimeMs, modified: stats.mtimeMs },
     },
     from: srcFull,
     to: destFull,
     timestamp: Date.now(),
+    copied: copy || false,
   };
 }
 
 export async function undoMove(action: MoveAction): Promise<void> {
-  const originalDir = action.from.replace(basename(action.from), '');
-  await mkdir(originalDir, { recursive: true });
-  await rename(action.to, action.from);
+  if (action.copied) {
+    const { unlink } = await import('fs/promises');
+    await unlink(action.to);
+  } else {
+    const originalDir = action.from.replace(basename(action.from), '');
+    await mkdir(originalDir, { recursive: true });
+    await rename(action.to, action.from);
+  }
 }

@@ -7,8 +7,9 @@ export interface FileItem {
 }
 
 export interface FileMetadata {
-  /** Last modified timestamp */
+  /** Timestamps */
   modified: number;
+  created: number;
   /** Image/video dimensions */
   width?: number;
   height?: number;
@@ -19,8 +20,7 @@ export interface FileMetadata {
 export interface Bucket {
   label: string;
   path: string;
-  /** Keyboard shortcut, e.g. "1", "k", "ctrl+d" */
-  shortcut?: string;
+  shortcut?: string; // Keyboard shortcut, e.g. "1", "k", "ctrl+d"
 }
 
 export interface SourceConfig {
@@ -29,6 +29,7 @@ export interface SourceConfig {
   recursive: boolean;
   include: string[];
   exclude: string[];
+  copy?: boolean; // If true, copy files instead of moving them
 }
 
 export interface AppConfig {
@@ -41,6 +42,7 @@ export interface MoveAction {
   from: string;
   to: string;
   timestamp: number;
+  copied: boolean;
 }
 
 export interface MoveRequest {

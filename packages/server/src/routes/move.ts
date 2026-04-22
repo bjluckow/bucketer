@@ -3,6 +3,7 @@ import { resolve } from 'path';
 import type { AppConfig, MoveAction, MoveRequest } from '@bucketer/shared';
 import * as local from '../services/local.js';
 import * as s3 from '../services/s3.js';
+import { getConfigDir } from '../config.js';
 
 const undoStack: MoveAction[] = [];
 
@@ -25,9 +26,9 @@ export function moveRouter(config: AppConfig): Router {
         source.type === 's3'
           ? await s3.moveFile(source.path, filePath, bucketPath, newName)
           : await local.moveFile(
-              resolve(source.path),
+              resolve(getConfigDir(), source.path),
               filePath,
-              resolve(bucketPath),
+              resolve(getConfigDir(), bucketPath),
               newName,
             );
 

@@ -1,10 +1,17 @@
 import { readFileSync } from 'fs';
-import { resolve } from 'path';
+import { resolve, dirname } from 'path';
 import yaml from 'js-yaml';
 import type { AppConfig } from '@bucketer/shared';
 
+let configDir = process.cwd();
+
+export function getConfigDir(): string {
+  return configDir;
+}
+
 export function loadConfig(configPath?: string): AppConfig {
   const resolvedPath = resolve(configPath || '../../config.yaml');
+  configDir = dirname(resolvedPath);
   const raw = readFileSync(resolvedPath, 'utf-8');
   const parsed = yaml.load(raw) as AppConfig;
 
@@ -16,7 +23,6 @@ export function loadConfig(configPath?: string): AppConfig {
     throw new Error('config.yaml: missing or empty "buckets" list');
   }
 
-  // Defaults
   parsed.source.recursive = parsed.source.recursive ?? true;
   parsed.source.include = parsed.source.include ?? [];
   parsed.source.exclude = parsed.source.exclude ?? [];
