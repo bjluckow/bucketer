@@ -1,0 +1,31 @@
+source:
+  type: local
+  path: ./sample-files
+  recursive: true
+  include:
+    - '*.jpg'
+    - '*.jpeg'
+    - '*.png'
+    - '*.gif'
+    - '*.webp'
+    - '*.mp4'
+    - '*.webm'
+    - '*.mp3'
+    - '*.wav'
+    - '*.pdf'
+    - '*.txt'
+    - '*.md'
+  exclude:
+    - '.DS_Store'
+    - 'thumbs/'
+
+buckets:
+  - label: Keep
+    path: ./sorted/keep
+    shortcut: '1'
+  - label: Trash
+    path: ./sorted/trash
+    shortcut: '2'
+  - label: Review Later
+    path: ./sorted/review
+    shortcut: '3'
