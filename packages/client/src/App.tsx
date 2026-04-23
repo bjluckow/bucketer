@@ -1,17 +1,18 @@
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useRef } from 'react';
 import { useBucketer } from './hooks/useBucketer';
 import FileViewer from './components/FileViewer';
 import FileInfo from './components/FileInfo';
 import BucketPanel from './components/BucketPanel';
-import styles from './App.module.css';
+import type { BucketPanelHandle } from './components/BucketPanel';
 import { UNDO_KEY } from './lib/config';
+import styles from './App.module.css';
 
 export default function App() {
   const {
     config,
     currentFile,
-    totalOriginal,
     processed,
+    total,
     canUndo,
     loading,
     error,
@@ -22,6 +23,8 @@ export default function App() {
     clearError,
   } = useBucketer();
 
+  const panelRef = useRef<BucketPanelHandle>(null);
+
   const handleMove = useCallback(
     (bucketPath: string) => {
       move(bucketPath);
@@ -29,12 +32,10 @@ export default function App() {
     [move],
   );
 
-  // Keyboard shortcuts
   useEffect(() => {
     if (!config) return;
 
     function handleKeyDown(e: KeyboardEvent) {
-      // Ignore if typing in an input
       if (
         e.target instanceof HTMLInputElement ||
         e.target instanceof HTMLTextAreaElement
@@ -42,17 +43,17 @@ export default function App() {
         return;
       }
 
-      // Undo
-      if (e.key === UNDO_KEY && !e.metaKey && !e.ctrlKey) {
+      if (e.key === UNDO_KEY) {
         e.preventDefault();
+        panelRef.current?.pulseUndo();
         undo();
         return;
       }
 
-      // Bucket shortcuts
       const bucket = config!.buckets.find((b) => b.shortcut === e.key);
       if (bucket) {
         e.preventDefault();
+        panelRef.current?.pulseButton(bucket.path);
         move(bucket.path);
       }
     }
@@ -61,7 +62,6 @@ export default function App() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [config, move, undo]);
 
-  // Auto-dismiss errors
   useEffect(() => {
     if (!error) return;
     const timer = setTimeout(clearError, 4000);
@@ -100,12 +100,13 @@ export default function App() {
         <div className={styles.divider} />
 
         <BucketPanel
+          ref={panelRef}
           buckets={config.buckets}
           onMove={handleMove}
           onUndo={undo}
           canUndo={canUndo}
           processed={processed}
-          totalOriginal={totalOriginal}
+          total={total}
         />
       </aside>
 

@@ -1,7 +1,7 @@
 import type { FileItem } from '@bucketer/shared';
 import { fileUrl } from '../api';
 import styles from './FileInfo.module.css';
-import { formatDate, formatSize } from '../lib/utils';
+import { formatDate, formatSize } from '../lib/format';
 
 interface FileInfoProps {
   file: FileItem | null;

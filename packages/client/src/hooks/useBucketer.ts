@@ -153,7 +153,7 @@ export function useBucketer() {
     config: state.config,
     currentFile,
     processed,
-    totalOriginal: state.total,
+    total: state.total,
     canUndo,
     done,
     loading: state.loading,
