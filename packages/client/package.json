@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "postal-mime": "^2.7.4",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
     "react-pdf": "^10.4.1"

@@ -6,6 +6,7 @@ import AudioViewer from './viewers/AudioViewer';
 import PdfViewer from './viewers/PdfViewer';
 import TextViewer from './viewers/TextViewer';
 import styles from './FileViewer.module.css';
+import EmailViewer from './viewers/EmailViewer';
 
 interface FileViewerProps {
   file: FileItem | null;
@@ -37,6 +38,10 @@ export default function FileViewer({ file }: FileViewerProps) {
 
   if (mime === 'application/pdf') {
     return <PdfViewer url={url} name={file.name} />;
+  }
+
+  if (mime === 'message/rfc822' || file.name.endsWith('.eml')) {
+    return <EmailViewer url={fileUrl(file.path)} name={file.name} />;
   }
 
   if (
