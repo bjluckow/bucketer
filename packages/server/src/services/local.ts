@@ -74,8 +74,8 @@ export async function listFiles(
             mime,
             size: stats.size,
             metadata: {
-              created: stats.birthtimeMs,
-              modified: stats.mtimeMs,
+              createdAt: stats.birthtimeMs,
+              modifiedAt: stats.mtimeMs,
             },
           });
         }
@@ -117,7 +117,7 @@ export async function moveFile(
       name: basename(filePath),
       mime,
       size: stats.size,
-      metadata: { created: stats.birthtimeMs, modified: stats.mtimeMs },
+      metadata: { createdAt: stats.birthtimeMs, modifiedAt: stats.mtimeMs },
     },
     from: srcFull,
     to: destFull,

@@ -1,3 +1,8 @@
+export interface AppConfig {
+  source: SourceConfig;
+  buckets: Bucket[];
+}
+
 export interface FileItem {
   path: string;
   name: string;
@@ -31,11 +36,6 @@ export interface SourceConfig {
   exclude: string[];
   copy?: boolean; // copy files instead of moving them
   groupBy?: 'none' | 'directory';
-}
-
-export interface AppConfig {
-  source: SourceConfig;
-  buckets: Bucket[];
 }
 
 export interface FileGroup {

@@ -101,7 +101,8 @@ export async function listFiles(
           mime: lookup(key) || 'application/octet-stream',
           size: obj.Size || 0,
           metadata: {
-            modified: obj.LastModified?.getTime() || 0,
+            modifiedAt: obj.LastModified?.getTime() || 0,
+            createdAt: obj.LastModified?.getTime() || 0, // NOTE: s3 objects do not have a creation time
           },
         });
       }
@@ -148,10 +149,14 @@ export async function moveFile(
       name: basename(filePath),
       mime: lookup(filePath) || 'application/octet-stream',
       size: 0,
-      metadata: { modified: Date.now() },
+      metadata: {
+        modifiedAt: Date.now(),
+        createdAt: Date.now(), // NOTE: s3 objects do not have a creation time
+      },
     },
     from: `s3://${src.bucket}/${sourceKey}`,
     to: `s3://${dest.bucket}/${destKey}`,
+    copied: false,
     timestamp: Date.now(),
   };
 }
