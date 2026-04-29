@@ -1,5 +1,4 @@
 import type { FileItem } from '@bucketer/shared';
-import { fileUrl } from '../api';
 import styles from './FileInfo.module.css';
 import { formatDate, formatSize } from '../lib/format';
 
@@ -53,19 +52,19 @@ export default function FileInfo({
           <span className={styles.metaLabel}>Size</span>
           <span className={styles.metaValue}>{formatSize(file.size)}</span>
         </div>
-        {file.metadata.created > 0 && (
+        {file.metadata.createdAt > 0 && (
           <div className={styles.metaRow}>
             <span className={styles.metaLabel}>Created</span>
             <span className={styles.metaValue}>
-              {formatDate(file.metadata.created)}
+              {formatDate(file.metadata.createdAt)}
             </span>
           </div>
         )}
-        {file.metadata.modified > 0 && (
+        {file.metadata.modifiedAt > 0 && (
           <div className={styles.metaRow}>
             <span className={styles.metaLabel}>Modified</span>
             <span className={styles.metaValue}>
-              {formatDate(file.metadata.modified)}
+              {formatDate(file.metadata.modifiedAt)}
             </span>
           </div>
         )}
@@ -77,12 +76,15 @@ export default function FileInfo({
             </span>
           </div>
         )}
-        {file.metadata.duration && (
+        {file.metadata.durationSecs && (
           <div className={styles.metaRow}>
             <span className={styles.metaLabel}>Duration</span>
             <span className={styles.metaValue}>
-              {Math.floor(file.metadata.duration / 60)}:
-              {String(Math.floor(file.metadata.duration % 60)).padStart(2, '0')}
+              {Math.floor(file.metadata.durationSecs / 60)}:
+              {String(Math.floor(file.metadata.durationSecs % 60)).padStart(
+                2,
+                '0',
+              )}
             </span>
           </div>
         )}

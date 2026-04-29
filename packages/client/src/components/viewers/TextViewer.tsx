@@ -6,7 +6,7 @@ interface TextViewerProps {
   name: string;
 }
 
-export default function TextViewer({ url, name }: TextViewerProps) {
+export default function TextViewer({ url }: TextViewerProps) {
   const [content, setContent] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

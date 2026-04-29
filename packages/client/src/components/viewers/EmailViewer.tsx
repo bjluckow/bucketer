@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import PostalMime from 'postal-mime';
-import { fileUrl } from '../../api';
 import styles from './EmailViewer.module.css';
 
 interface EmailViewerProps {
