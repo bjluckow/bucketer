@@ -3,7 +3,7 @@ import { resolve, join } from 'path';
 import { createReadStream } from 'fs';
 import { stat } from 'fs/promises';
 import { lookup } from 'mime-types';
-import type { AppConfig } from '@bucketer/shared';
+import type { AppConfig, FileGroup } from '@bucketer/shared';
 import * as local from '../services/local.js';
 import * as s3 from '../services/s3.js';
 import { getConfigDir } from '../config.js';
@@ -33,7 +33,16 @@ export function filesRouter(config: AppConfig): Router {
               source.exclude,
             );
 
-      res.json(files);
+      if (source.groupBy === 'directory') {
+        res.json(local.groupByDirectory(files));
+      } else {
+        // Wrap each file as its own group for consistent shape
+        const groups: FileGroup[] = files.map((f) => ({
+          directory: null,
+          files: [f],
+        }));
+        res.json(groups);
+      }
     } catch (err) {
       console.error('[files] list error:', err);
       res.status(500).json({ error: 'Failed to list files' });

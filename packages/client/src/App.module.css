@@ -5,13 +5,21 @@
   position: relative;
 }
 
+.main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+
 .viewer {
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: var(--spacing-lg);
   overflow: auto;
-  min-width: 0;
+  min-height: 0;
 }
 
 .panel {

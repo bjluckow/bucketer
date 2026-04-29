@@ -1,25 +1,32 @@
 import { useEffect, useCallback, useRef } from 'react';
 import { useBucketer } from './hooks/useBucketer';
-import FileViewer from './components/FileViewer';
-import FileInfo from './components/FileInfo';
-import BucketPanel from './components/BucketPanel';
-import type { BucketPanelHandle } from './components/BucketPanel';
+import { FileViewer, Filmstrip } from './components/viewer';
+import { BucketPanel, FileInfo } from './components/panel';
+import type { BucketPanelHandle } from './components/panel';
 import { UNDO_KEY } from './lib/config';
 import styles from './App.module.css';
 
 export default function App() {
   const {
     config,
+    currentGroup,
     currentFile,
+    fileIndex,
+    filesInGroup,
+    isGrouped,
     processed,
     total,
     canUndo,
+    done,
     loading,
     error,
     editedName,
     setEditedName,
     move,
     undo,
+    nextFile,
+    prevFile,
+    goToFile,
     clearError,
   } = useBucketer();
 
@@ -50,6 +57,18 @@ export default function App() {
         return;
       }
 
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        prevFile();
+        return;
+      }
+
+      if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        nextFile();
+        return;
+      }
+
       const bucket = config!.buckets.find((b) => b.shortcut === e.key);
       if (bucket) {
         e.preventDefault();
@@ -60,7 +79,7 @@ export default function App() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [config, move, undo]);
+  }, [config, move, undo, nextFile, prevFile]);
 
   useEffect(() => {
     if (!error) return;
@@ -84,15 +103,37 @@ export default function App() {
     );
   }
 
+  if (done) {
+    return (
+      <div className={styles.loading}>
+        <p>All done! {total} items processed.</p>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.layout}>
-      <main className={styles.viewer}>
-        <FileViewer file={currentFile} />
-      </main>
+      <div className={styles.main}>
+        <div className={styles.viewer}>
+          <FileViewer file={currentFile} />
+        </div>
+
+        {isGrouped && currentGroup && filesInGroup > 1 && (
+          <Filmstrip
+            files={currentGroup.files}
+            activeIndex={fileIndex}
+            onSelect={goToFile}
+          />
+        )}
+      </div>
 
       <aside className={styles.panel}>
         <FileInfo
+          group={currentGroup}
           file={currentFile}
+          fileIndex={fileIndex}
+          filesInGroup={filesInGroup}
+          isGrouped={isGrouped}
           editedName={editedName}
           onNameChange={setEditedName}
         />

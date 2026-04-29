@@ -1,6 +1,7 @@
 source:
   type: local
   path: ./example
+  copy: true
   recursive: true
   include:
     - '*.jpg'
@@ -26,6 +27,6 @@ buckets:
   - label: Dogs
     path: ./example/sorted/dogs
     shortcut: '2'
-  - label: Some Other Third Thing
-    path: ./example/sorted/review
+  - label: Other
+    path: ./example/sorted/other
     shortcut: '3'

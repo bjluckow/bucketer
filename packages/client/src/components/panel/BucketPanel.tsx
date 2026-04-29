@@ -8,7 +8,7 @@ import {
 import type { Bucket } from '@bucketer/shared';
 
 import styles from './BucketPanel.module.css';
-import { keyLabel } from '../lib/format';
+import { keyLabel } from '@/lib/format';
 
 interface BucketPanelProps {
   buckets: Bucket[];

@@ -119,6 +119,7 @@ export async function moveFile(
   filePath: string,
   bucketPath: string,
   newName?: string,
+  copy?: boolean,
 ): Promise<MoveAction> {
   const s3 = getClient();
   const src = parsePath(sourcePath);
@@ -136,12 +137,14 @@ export async function moveFile(
     }),
   );
 
-  await s3.send(
-    new DeleteObjectCommand({
-      Bucket: src.bucket,
-      Key: sourceKey,
-    }),
-  );
+  if (!copy) {
+    await s3.send(
+      new DeleteObjectCommand({
+        Bucket: src.bucket,
+        Key: sourceKey,
+      }),
+    );
+  }
 
   return {
     file: {
@@ -156,7 +159,7 @@ export async function moveFile(
     },
     from: `s3://${src.bucket}/${sourceKey}`,
     to: `s3://${dest.bucket}/${destKey}`,
-    copied: false,
+    copied: copy || false,
     timestamp: Date.now(),
   };
 }

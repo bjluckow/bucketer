@@ -4,10 +4,12 @@ import {
   rename,
   mkdir,
   copyFile as fsCopyFile,
+  cp,
+  rm,
 } from 'fs/promises';
-import { join, basename, extname, relative } from 'path';
+import { join, basename, extname, relative, dirname } from 'path';
 import { lookup } from 'mime-types';
-import type { FileItem, MoveAction } from '@bucketer/shared';
+import type { FileGroup, FileItem, MoveAction } from '@bucketer/shared';
 
 function matchesGlob(filename: string, pattern: string): boolean {
   if (pattern.startsWith('*.')) {
@@ -128,11 +130,87 @@ export async function moveFile(
 
 export async function undoMove(action: MoveAction): Promise<void> {
   if (action.copied) {
-    const { unlink } = await import('fs/promises');
-    await unlink(action.to);
+    const stats = await stat(action.to);
+    if (stats.isDirectory()) {
+      await rm(action.to, { recursive: true });
+    } else {
+      const { unlink } = await import('fs/promises');
+      await unlink(action.to);
+    }
   } else {
-    const originalDir = action.from.replace(basename(action.from), '');
+    const originalDir = dirname(action.from);
     await mkdir(originalDir, { recursive: true });
     await rename(action.to, action.from);
   }
+}
+
+export function groupByDirectory(files: FileItem[]): FileGroup[] {
+  const groups = new Map<string, FileItem[]>();
+  const ungrouped: FileItem[] = [];
+
+  for (const file of files) {
+    const dir = file.path.includes('/') ? file.path.split('/')[0] : null;
+
+    if (dir) {
+      if (!groups.has(dir)) {
+        groups.set(dir, []);
+      }
+      groups.get(dir)!.push(file);
+    } else {
+      ungrouped.push(file);
+    }
+  }
+
+  const result: FileGroup[] = [];
+
+  // Each ungrouped file is its own group
+  for (const file of ungrouped) {
+    result.push({ directory: null, files: [file] });
+  }
+
+  // Directories as groups
+  for (const [directory, files] of groups) {
+    result.push({ directory, files });
+  }
+
+  return result;
+}
+
+export async function moveDirectory(
+  sourceRoot: string,
+  dirPath: string,
+  bucketPath: string,
+  newName?: string,
+  copy?: boolean,
+): Promise<MoveAction> {
+  const srcFull = join(sourceRoot, dirPath);
+  const dirName = newName || basename(dirPath);
+  const destFull = join(bucketPath, dirName);
+
+  await mkdir(bucketPath, { recursive: true });
+
+  if (copy) {
+    await cp(srcFull, destFull, { recursive: true });
+  } else {
+    await rename(srcFull, destFull);
+  }
+
+  const stats = await stat(destFull);
+
+  return {
+    file: {
+      path: dirPath,
+      name: basename(dirPath),
+      mime: 'inode/directory',
+      size: 0,
+      metadata: {
+        modifiedAt: stats.mtimeMs,
+        createdAt: stats.birthtimeMs,
+      },
+    },
+    from: srcFull,
+    to: destFull,
+    timestamp: Date.now(),
+    copied: copy || false,
+  };
 }

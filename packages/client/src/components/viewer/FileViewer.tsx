@@ -1,5 +1,5 @@
 import type { FileItem } from '@bucketer/shared';
-import { fileUrl } from '../api';
+import { fileUrl } from '../../api';
 import ImageViewer from './viewers/ImageViewer';
 import VideoViewer from './viewers/VideoViewer';
 import AudioViewer from './viewers/AudioViewer';

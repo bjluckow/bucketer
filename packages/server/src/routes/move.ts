@@ -1,9 +1,9 @@
 import { Router } from 'express';
 import { resolve } from 'path';
-import type { AppConfig, MoveAction, MoveRequest } from '@bucketer/shared';
+import type { AppConfig, MoveAction } from '@bucketer/shared';
+import { getConfigDir } from '../config.js';
 import * as local from '../services/local.js';
 import * as s3 from '../services/s3.js';
-import { getConfigDir } from '../config.js';
 
 const undoStack: MoveAction[] = [];
 
@@ -11,8 +11,11 @@ export function moveRouter(config: AppConfig): Router {
   const router = Router();
 
   router.post('/api/move', async (req, res) => {
-    const { filePath, bucketPath, newName } = req.body as MoveRequest & {
+    const { filePath, bucketPath, newName, isDirectory } = req.body as {
+      filePath: string;
+      bucketPath: string;
       newName?: string;
+      isDirectory?: boolean;
     };
 
     if (!filePath || !bucketPath) {
@@ -22,17 +25,37 @@ export function moveRouter(config: AppConfig): Router {
 
     try {
       const { source } = config;
-      const action =
-        source.type === 's3'
-          ? await s3.moveFile(source.path, filePath, bucketPath, newName)
-          : await local.moveFile(
-              resolve(getConfigDir(), source.path),
-              filePath,
-              resolve(getConfigDir(), bucketPath),
-              newName,
-            );
+      const configDir = getConfigDir();
+      const copy = source.copy || false;
 
-      undoStack.push(action);
+      if (isDirectory) {
+        const action = await local.moveDirectory(
+          resolve(configDir, source.path),
+          filePath,
+          resolve(configDir, bucketPath),
+          newName,
+          copy,
+        );
+        undoStack.push(action);
+      } else {
+        const action =
+          source.type === 's3'
+            ? await s3.moveFile(
+                source.path,
+                filePath,
+                bucketPath,
+                newName,
+                copy,
+              )
+            : await local.moveFile(
+                resolve(configDir, source.path),
+                filePath,
+                resolve(configDir, bucketPath),
+                newName,
+                copy,
+              );
+        undoStack.push(action);
+      }
 
       res.json({
         success: true,

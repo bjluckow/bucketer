@@ -52,6 +52,10 @@
   border-top: 1px solid var(--color-border);
 }
 
+.fileHeader {
+  padding-bottom: var(--spacing-xs);
+}
+
 .metaRow {
   display: flex;
   justify-content: space-between;

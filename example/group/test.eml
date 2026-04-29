@@ -1,0 +1,27 @@
+From: sender@example.com
+To: recipient@example.com
+Subject: Test Email with Attachments
+Date: Mon, 28 Apr 2026 10:00:00 -0400
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="boundary123"
+
+--boundary123
+Content-Type: text/plain; charset="utf-8"
+
+This is the email body. Here's a test email with two attachments.
+
+--boundary123
+Content-Type: text/plain; charset="utf-8"; name="notes.txt"
+Content-Disposition: attachment; filename="notes.txt"
+Content-Transfer-Encoding: base64
+
+SGVsbG8gZnJvbSB0aGUgYXR0YWNobWVudCE=
+
+--boundary123
+Content-Type: image/png; name="pixel.png"
+Content-Disposition: attachment; filename="pixel.png"
+Content-Transfer-Encoding: base64
+
+iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFklEQVQYV2P8z8BQz0BFwMgwasCoAgBOIAMJ/RfigAAAAABJRU5ErkJggg==
+
+--boundary123--
